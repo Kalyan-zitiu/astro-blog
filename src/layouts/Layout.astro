@@ -61,6 +61,8 @@ const {
 	}
 
 	body {
+		position: relative;
+		isolation: isolate;
 		min-height: 100vh;
 		overflow-x: hidden;
 		text-rendering: geometricPrecision;
@@ -69,11 +71,12 @@ const {
 	body::before {
 		position: fixed;
 		inset: 0;
-		z-index: -7;
+		z-index: 1;
 		content: '';
 		background:
 			linear-gradient(115deg, rgba(0, 245, 212, 0.08), transparent 34%),
 			linear-gradient(245deg, rgba(255, 45, 149, 0.08), transparent 36%);
+		pointer-events: none;
 	}
 
 	button,
@@ -89,6 +92,11 @@ const {
 
 	a {
 		color: inherit;
+	}
+
+	body > main {
+		position: relative;
+		z-index: 5;
 	}
 
 	::selection {

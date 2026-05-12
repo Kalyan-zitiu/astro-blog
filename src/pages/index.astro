@@ -355,7 +355,7 @@ const readMinutes = (body?: string) => `${Math.max(1, Math.ceil((body?.length ??
 	.guide-background {
 		position: fixed;
 		inset: 0;
-		z-index: -6;
+		z-index: 0;
 		overflow: hidden;
 		pointer-events: none;
 		background: #05070d;
@@ -436,6 +436,7 @@ const readMinutes = (body?: string) => `${Math.max(1, Math.ceil((body?.length ??
 
 	.site-shell {
 		position: relative;
+		z-index: 5;
 		width: min(1180px, calc(100% - 32px));
 		margin: 0 auto;
 		padding: 48px 0 80px;
