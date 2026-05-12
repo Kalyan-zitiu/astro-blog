@@ -37,11 +37,6 @@ const formatDate = (date: Date) =>
 				<p class="system-label">{categoryLabel[post.data.category]} / {formatDate(post.data.pubDate)}</p>
 				<h1>{post.data.title}</h1>
 				<p>{post.data.description}</p>
-				<div class="tag-row">
-					{post.data.tags.map((tag) => (
-						<span>{tag}</span>
-					))}
-				</div>
 			</header>
 			<div class="article-body">
 				<Content />
@@ -79,11 +74,7 @@ const formatDate = (date: Date) =>
 	}
 
 	.article-header {
-		padding: 44px 0 38px;
-		border-bottom: 1px solid color-mix(in srgb, var(--accent, var(--cyan)) 34%, transparent);
-		background:
-			linear-gradient(90deg, rgba(0, 245, 212, 0.09), transparent 38%),
-			linear-gradient(135deg, rgba(255, 45, 149, 0.08), transparent 42%);
+		padding: 32px 0 34px;
 	}
 
 	.system-label {
@@ -108,22 +99,6 @@ const formatDate = (date: Date) =>
 		color: var(--muted);
 		font-size: 21px;
 		line-height: 1.8;
-	}
-
-	.tag-row {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
-		margin-top: 20px;
-	}
-
-	.tag-row span {
-		padding: 6px 9px;
-		border: 1px solid rgba(255, 255, 255, 0.14);
-		border-radius: 6px;
-		background: rgba(255, 255, 255, 0.05);
-		color: #d7e7f2;
-		font-size: 12px;
 	}
 
 	.article-body {

@@ -52,7 +52,6 @@ const readMinutes = (body?: string) => `${Math.max(1, Math.ceil((body?.length ??
 		<img src={guideBackground.src} alt="" fetchpriority="high" decoding="async" />
 	</div>
 	<ParticleField />
-	<div class="interaction-layer" data-interaction-layer aria-hidden="true"></div>
 	<main class="site-shell">
 		<section class="hero" id="top" aria-labelledby="site-logo">
 			<div class="hero-copy">
@@ -215,9 +214,6 @@ const readMinutes = (body?: string) => `${Math.max(1, Math.ceil((body?.length ??
 	const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
 	const quickButtons = Array.from(document.querySelectorAll('[data-filter-target]'));
 	const cards = Array.from(document.querySelectorAll('[data-category]'));
-	const interactionLayer = document.querySelector('[data-interaction-layer]');
-	const supportsFinePointer = window.matchMedia('(pointer: fine)').matches;
-	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 	const setFilter = (filter, shouldScroll = false) => {
 		const nextFilter = categories.includes(filter) ? filter : 'all';
@@ -258,79 +254,6 @@ const readMinutes = (body?: string) => `${Math.max(1, Math.ceil((body?.length ??
 	if (categories.includes(initialHash)) {
 		setFilter(initialHash);
 	}
-
-	if (interactionLayer && !prefersReducedMotion) {
-		const spawnClickEffect = (x, y) => {
-			const pulse = document.createElement('span');
-			pulse.className = 'click-pulse';
-			pulse.style.left = `${x}px`;
-			pulse.style.top = `${y}px`;
-			interactionLayer.append(pulse);
-			pulse.addEventListener('animationend', () => pulse.remove(), { once: true });
-
-			for (let index = 0; index < 5; index += 1) {
-				const spark = document.createElement('span');
-				const angle = (Math.PI * 2 * index) / 5;
-				const distance = 24 + index * 5;
-				spark.className = 'click-spark';
-				spark.style.left = `${x}px`;
-				spark.style.top = `${y}px`;
-				spark.style.setProperty('--spark-x', `${Math.cos(angle) * distance}px`);
-				spark.style.setProperty('--spark-y', `${Math.sin(angle) * distance}px`);
-				interactionLayer.append(spark);
-				spark.addEventListener('animationend', () => spark.remove(), { once: true });
-			}
-		};
-
-		document.addEventListener(
-			'click',
-			(event) => {
-				spawnClickEffect(event.clientX, event.clientY);
-			},
-			{ passive: true },
-		);
-
-		if (supportsFinePointer) {
-			const trail = Array.from({ length: 10 }, (_, index) => {
-				const point = document.createElement('span');
-				point.className = 'cursor-trail';
-				point.style.setProperty('--trail-scale', `${1 - index * 0.065}`);
-				point.style.setProperty('--trail-alpha', `${0.72 - index * 0.055}`);
-				interactionLayer.append(point);
-				return { node: point, x: window.innerWidth / 2, y: window.innerHeight / 2 };
-			});
-
-			const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-			let trailFrame = 0;
-
-			document.addEventListener(
-				'pointermove',
-				(event) => {
-					pointer.x = event.clientX;
-					pointer.y = event.clientY;
-					if (trailFrame === 0) {
-						trailFrame = requestAnimationFrame(renderTrail);
-					}
-				},
-				{ passive: true },
-			);
-
-			function renderTrail() {
-				let targetX = pointer.x;
-				let targetY = pointer.y;
-
-				for (const point of trail) {
-					point.x += (targetX - point.x) * 0.34;
-					point.y += (targetY - point.y) * 0.34;
-					point.node.style.transform = `translate3d(${point.x}px, ${point.y}px, 0) translate(-50%, -50%) scale(var(--trail-scale))`;
-					targetX = point.x;
-					targetY = point.y;
-				}
-
-				trailFrame = 0;
-			}
-		}
-	}
 </script>
 
 <style>
@@ -362,58 +285,6 @@ const readMinutes = (body?: string) => `${Math.max(1, Math.ceil((body?.length ??
 			radial-gradient(circle at 78% 34%, rgba(255, 45, 149, 0.13), transparent 26%),
 			linear-gradient(90deg, rgba(5, 7, 13, 0.64), rgba(5, 7, 13, 0.18) 48%, rgba(5, 7, 13, 0.72)),
 			linear-gradient(180deg, rgba(5, 7, 13, 0.2), #05070d 92%);
-	}
-
-	.interaction-layer {
-		position: fixed;
-		inset: 0;
-		z-index: 1000;
-		overflow: hidden;
-		pointer-events: none;
-	}
-
-	:global(.click-pulse),
-	:global(.click-spark),
-	:global(.cursor-trail) {
-		position: absolute;
-		left: 0;
-		top: 0;
-		pointer-events: none;
-	}
-
-	:global(.click-pulse) {
-		width: 18px;
-		height: 18px;
-		border: 1px solid rgba(0, 245, 212, 0.9);
-		border-radius: 999px;
-		box-shadow:
-			0 0 16px rgba(0, 245, 212, 0.48),
-			0 0 30px rgba(255, 45, 149, 0.24);
-		transform: translate(-50%, -50%) scale(0.4);
-		animation: click-pulse 560ms ease-out forwards;
-	}
-
-	:global(.click-spark) {
-		width: 4px;
-		height: 18px;
-		border-radius: 999px;
-		background: linear-gradient(180deg, var(--amber), var(--cyan));
-		box-shadow: 0 0 14px rgba(0, 245, 212, 0.54);
-		transform: translate(-50%, -50%);
-		animation: click-spark 520ms ease-out forwards;
-	}
-
-	:global(.cursor-trail) {
-		width: 12px;
-		height: 12px;
-		border: 1px solid rgba(0, 245, 212, var(--trail-alpha));
-		border-radius: 999px;
-		background: rgba(0, 245, 212, 0.08);
-		box-shadow:
-			0 0 18px rgba(0, 245, 212, 0.22),
-			0 0 28px rgba(255, 45, 149, 0.13);
-		opacity: var(--trail-alpha);
-		will-change: transform;
 	}
 
 	.site-shell {
@@ -918,20 +789,6 @@ const readMinutes = (body?: string) => `${Math.max(1, Math.ceil((body?.length ??
 
 		50% {
 			transform: rotateX(11deg) rotateY(-18deg) skewX(-8deg) translate(8px, -3px);
-		}
-	}
-
-	@keyframes click-pulse {
-		to {
-			opacity: 0;
-			transform: translate(-50%, -50%) scale(4.2);
-		}
-	}
-
-	@keyframes click-spark {
-		to {
-			opacity: 0;
-			transform: translate(calc(-50% + var(--spark-x)), calc(-50% + var(--spark-y))) scaleY(0.2);
 		}
 	}
 

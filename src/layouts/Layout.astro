@@ -1,4 +1,6 @@
 ---
+import InteractionLayer from '../components/InteractionLayer.astro';
+
 interface Props {
 	title?: string;
 	description?: string;
@@ -23,6 +25,7 @@ const {
 	</head>
 	<body>
 		<slot />
+		<InteractionLayer />
 	</body>
 </html>
 
