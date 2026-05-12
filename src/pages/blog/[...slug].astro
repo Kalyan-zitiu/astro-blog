@@ -1,0 +1,214 @@
+---
+import { getCollection, render } from 'astro:content';
+import ParticleField from '../../components/ParticleField.astro';
+import Layout from '../../layouts/Layout.astro';
+
+const categoryLabel = {
+	life: '生活',
+	tech: '技术',
+	work: '工作',
+};
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog', ({ data }) => data.draft !== true);
+
+	return posts.map((post) => ({
+		params: { slug: post.id },
+		props: { post },
+	}));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const formatDate = (date: Date) =>
+	new Intl.DateTimeFormat('zh-CN', {
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+	}).format(date);
+---
+
+<Layout title={`${post.data.title} | Kalyan`} description={post.data.description}>
+	<ParticleField />
+	<main class="article-shell">
+		<a class="back-link" href="/#blog">返回文章分类</a>
+		<article class={`article-panel accent-${post.data.accent}`}>
+			<header class="article-header">
+				<p class="system-label">{categoryLabel[post.data.category]} / {formatDate(post.data.pubDate)}</p>
+				<h1>{post.data.title}</h1>
+				<p>{post.data.description}</p>
+				<div class="tag-row">
+					{post.data.tags.map((tag) => (
+						<span>{tag}</span>
+					))}
+				</div>
+			</header>
+			<div class="article-body">
+				<Content />
+			</div>
+		</article>
+	</main>
+</Layout>
+
+<style>
+	.article-shell {
+		width: min(860px, calc(100% - 32px));
+		margin: 0 auto;
+		padding: 42px 0 84px;
+	}
+
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		margin-bottom: 24px;
+		color: var(--cyan);
+		font-size: 14px;
+		font-weight: 800;
+		text-decoration: none;
+		text-transform: uppercase;
+	}
+
+	.back-link:hover,
+	.back-link:focus-visible {
+		color: var(--amber);
+	}
+
+	.article-panel {
+		position: relative;
+		padding: 34px;
+		border: 1px solid color-mix(in srgb, var(--accent, var(--cyan)) 44%, transparent);
+		border-radius: 8px;
+		background:
+			linear-gradient(150deg, rgba(8, 14, 22, 0.96), rgba(14, 21, 30, 0.88)) padding-box,
+			linear-gradient(135deg, rgba(0, 245, 212, 0.46), rgba(255, 45, 149, 0.28)) border-box;
+		box-shadow:
+			12px 12px 0 rgba(0, 245, 212, 0.08),
+			22px 22px 0 rgba(255, 45, 149, 0.06),
+			0 34px 70px rgba(0, 0, 0, 0.42),
+			inset 0 1px 0 rgba(255, 255, 255, 0.11);
+	}
+
+	.article-panel::before,
+	.article-panel::after {
+		position: absolute;
+		z-index: -1;
+		border-radius: 8px;
+		content: '';
+	}
+
+	.article-panel::before {
+		inset: 8px -12px -12px 8px;
+		background: linear-gradient(135deg, rgba(0, 245, 212, 0.16), rgba(255, 45, 149, 0.16));
+	}
+
+	.article-panel::after {
+		inset: 0;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		transform: translate(4px, 4px);
+	}
+
+	.article-header {
+		padding-bottom: 28px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+	}
+
+	.system-label {
+		margin: 0 0 16px;
+		color: var(--amber);
+		font-size: 13px;
+		font-weight: 900;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	.article-header h1 {
+		margin: 0;
+		font-size: 48px;
+		line-height: 1.12;
+	}
+
+	.article-header p:not(.system-label) {
+		max-width: 680px;
+		margin: 18px 0 0;
+		color: var(--muted);
+		font-size: 18px;
+		line-height: 1.8;
+	}
+
+	.tag-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: 20px;
+	}
+
+	.tag-row span {
+		padding: 6px 9px;
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		border-radius: 6px;
+		background: rgba(255, 255, 255, 0.05);
+		color: #d7e7f2;
+		font-size: 12px;
+	}
+
+	.article-body {
+		padding-top: 30px;
+		color: #dce9f4;
+		font-size: 18px;
+		line-height: 1.9;
+	}
+
+	:global(.article-body h2) {
+		margin: 34px 0 12px;
+		color: #ffffff;
+		font-size: 28px;
+		line-height: 1.25;
+	}
+
+	:global(.article-body p) {
+		margin: 0 0 20px;
+	}
+
+	:global(.article-body code) {
+		padding: 2px 6px;
+		border: 1px solid rgba(0, 245, 212, 0.28);
+		border-radius: 6px;
+		background: rgba(0, 245, 212, 0.08);
+		color: var(--green);
+	}
+
+	.accent-cyan {
+		--accent: var(--cyan);
+	}
+
+	.accent-magenta {
+		--accent: var(--magenta);
+	}
+
+	.accent-amber {
+		--accent: var(--amber);
+	}
+
+	.accent-green {
+		--accent: var(--green);
+	}
+
+	@media (max-width: 680px) {
+		.article-shell {
+			width: min(100% - 24px, 860px);
+			padding-top: 28px;
+		}
+
+		.article-panel {
+			padding: 24px 18px;
+		}
+
+		.article-header h1 {
+			font-size: 34px;
+		}
+
+		.article-body {
+			font-size: 16px;
+		}
+	}
+</style>

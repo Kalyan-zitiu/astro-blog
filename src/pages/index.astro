@@ -1,11 +1,868 @@
 ---
-import Welcome from '../components/Welcome.astro';
+import { getCollection } from 'astro:content';
+import ParticleField from '../components/ParticleField.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const categories = {
+	life: {
+		label: '生活',
+		kicker: 'Life',
+		description: '城市片段、习惯复盘和日常灵感。',
+		icon: 'M12 3.5c3.8 0 7 2.8 7 6.4 0 4.7-5.6 9.5-7 10.6-1.4-1.1-7-5.9-7-10.6 0-3.6 3.2-6.4 7-6.4Zm0 8.8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z',
+	},
+	tech: {
+		label: '技术',
+		kicker: 'Tech',
+		description: '工程笔记、工具链、前端与自动化。',
+		icon: 'M8 9.5 4.5 13 8 16.5M16 9.5 19.5 13 16 16.5M14 5 10 21',
+	},
+	work: {
+		label: '工作',
+		kicker: 'Work',
+		description: '项目推进、协作方法和复盘模板。',
+		icon: 'M4.5 8.5h15v10h-15zM8.5 8.5V6.2c0-.9.7-1.7 1.7-1.7h3.6c1 0 1.7.8 1.7 1.7v2.3M4.5 12.5h15',
+	},
+} as const;
+
+const posts = (await getCollection('blog', ({ data }) => data.draft !== true)).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+const counts = posts.reduce(
+	(total, post) => {
+		total[post.data.category] += 1;
+		return total;
+	},
+	{ life: 0, tech: 0, work: 0 },
+);
+
+const featuredPost = posts.find((post) => post.data.featured) ?? posts[0];
+const formatDate = (date: Date) =>
+	new Intl.DateTimeFormat('zh-CN', {
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+	}).format(date);
+const readMinutes = (body?: string) => `${Math.max(1, Math.ceil((body?.length ?? 0) / 520))} 分钟`;
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Kalyan | 个人赛博博客" description="Kalyan 的个人引导页与博客，分类收纳生活、技术、工作记录。">
+	<ParticleField />
+	<main class="site-shell">
+		<section class="hero" id="top" aria-labelledby="site-logo">
+			<div class="hero-copy">
+				<p class="system-label">Personal uplink / Cyber notes</p>
+				<div class="logo-wrap" aria-label="Kalyan">
+					<h1 id="site-logo" class="logo-mark">Kalyan</h1>
+				</div>
+				<p class="hero-text">
+					把生活、技术和工作记录接入同一块信号板。这里是入口，也是持续写作的控制台。
+				</p>
+			</div>
+
+			<nav class="signal-dock" aria-label="Kalyan 导航链接">
+				<a class="dock-link depth-block" href="mailto:hello@kalyan.dev">
+					<span class="link-icon">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M4 6.5h16v11H4z" />
+							<path d="m4.5 7 7.5 6 7.5-6" />
+						</svg>
+					</span>
+					<span>邮箱</span>
+				</a>
+
+				<a class="dock-link depth-block" href="https://www.tiktok.com/@kalyan" target="_blank" rel="noreferrer">
+					<span class="link-icon">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M14 4v10.2a4.2 4.2 0 1 1-4.2-4.2" />
+							<path d="M14 4c.5 3.2 2.5 5 5.5 5.4" />
+						</svg>
+					</span>
+					<span>TikTok</span>
+				</a>
+
+				<div class="dock-cluster blog-hub depth-block">
+					<a class="dock-link dock-link-flat" href="#blog" aria-haspopup="true">
+						<span class="link-icon">
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								<path d="M6 4.5h9.5L19 8v11.5H6z" />
+								<path d="M15 4.5V8h4" />
+								<path d="M9 12h6M9 15h5" />
+							</svg>
+						</span>
+						<span>博客</span>
+					</a>
+					<div class="category-popover" aria-label="博客分类">
+						<p>选择频道</p>
+						{Object.entries(categories).map(([key, category]) => (
+							<button type="button" class="popover-option" data-filter-target={key}>
+								<span>{category.label}</span>
+								<small>{counts[key]} 篇</small>
+							</button>
+						))}
+					</div>
+				</div>
+
+				<a class="dock-link depth-block" href="#wechat-card">
+					<span class="link-icon">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9.2 15.8c-3.1 0-5.7-2-5.7-4.6s2.6-4.7 5.7-4.7 5.7 2.1 5.7 4.7-2.6 4.6-5.7 4.6Z" />
+							<path d="M13.6 10.2c3 0 5.4 1.9 5.4 4.3 0 1.2-.6 2.2-1.5 3l.4 2-2.2-1.1c-.7.2-1.4.4-2.1.4-2.9 0-5.3-1.9-5.3-4.3" />
+							<path d="M7.5 10h.1M11 10h.1M12.2 14.2h.1M15.4 14.2h.1" />
+						</svg>
+					</span>
+					<span>微信</span>
+				</a>
+
+				<a class="dock-link depth-block" href="/resume/">
+					<span class="link-icon">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M7 4.5h7l3 3v12H7z" />
+							<path d="M14 4.5v3h3M9.5 12h5M9.5 15h5M9.5 9h2" />
+						</svg>
+					</span>
+					<span>简历</span>
+				</a>
+
+				<a class="dock-link depth-block" href="https://github.com/kalyan" target="_blank" rel="noreferrer">
+					<span class="link-icon">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M12 3.5a8.7 8.7 0 0 0-2.8 17c.4.1.5-.2.5-.4v-1.6c-2.2.5-2.7-.9-2.7-.9-.4-.9-.9-1.1-.9-1.1-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.2 1.9.8 2.3.6.1-.5.3-.8.5-1-1.8-.2-3.6-.9-3.6-3.9 0-.9.3-1.6.8-2.2-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.3.8.7-.2 1.4-.3 2.1-.3s1.5.1 2.1.3c1.6-1 2.3-.8 2.3-.8.5 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.2 0 3-1.8 3.7-3.6 3.9.3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8.7 8.7 0 0 0 12 3.5Z" />
+						</svg>
+					</span>
+					<span>GitHub</span>
+				</a>
+			</nav>
+		</section>
+
+		<section class="feature-strip" aria-label="站点摘要">
+			<div class="depth-block status-tile">
+				<span class="status-dot"></span>
+				<strong>分类</strong>
+				<p>生活 / 技术 / 工作</p>
+			</div>
+			<div class="depth-block status-tile">
+				<span class="status-dot status-dot-pink"></span>
+				<strong>文章</strong>
+				<p>{posts.length} 篇已上线</p>
+			</div>
+			<div class="depth-block status-tile" id="wechat-card">
+				<span class="status-dot status-dot-amber"></span>
+				<strong>微信</strong>
+				<p>kalyan-wechat</p>
+			</div>
+		</section>
+
+		<section class="blog-board" id="blog" aria-labelledby="blog-title">
+			<div class="section-heading">
+				<p class="system-label">Blog channels</p>
+				<h2 id="blog-title">文章分类</h2>
+				<p>点击大类即可切换文章列表；博客图标悬停的小框也会接入同一套分类。</p>
+			</div>
+
+			<div class="category-tabs" role="group" aria-label="文章分类筛选">
+				<button class="category-tab active" type="button" data-filter="all" aria-pressed="true">
+					<span class="category-icon">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M5 5h6v6H5zM13 5h6v6h-6zM5 13h6v6H5zM13 13h6v6h-6z" />
+						</svg>
+					</span>
+					<strong>全部</strong>
+					<small>{posts.length} 篇</small>
+				</button>
+
+				{Object.entries(categories).map(([key, category]) => (
+					<button class="category-tab" type="button" data-filter={key} aria-pressed="false">
+						<span class="category-icon">
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								<path d={category.icon} />
+							</svg>
+						</span>
+						<strong>{category.label}</strong>
+						<small>{category.description}</small>
+					</button>
+				))}
+			</div>
+
+			{featuredPost && (
+				<a class={`featured depth-block accent-${featuredPost.data.accent}`} href={`/blog/${featuredPost.id}/`}>
+					<span class="featured-kicker">Featured signal</span>
+					<strong>{featuredPost.data.title}</strong>
+					<p>{featuredPost.data.description}</p>
+					<span>{formatDate(featuredPost.data.pubDate)} / {readMinutes(featuredPost.body)}</span>
+				</a>
+			)}
+
+			<div class="post-grid" data-post-grid>
+				{posts.map((post) => {
+					const category = categories[post.data.category];
+					return (
+						<a
+							class={`post-card depth-block accent-${post.data.accent}`}
+							href={`/blog/${post.id}/`}
+							data-category={post.data.category}
+						>
+							<span class="post-glyph">
+								<svg viewBox="0 0 24 24" aria-hidden="true">
+									<path d={category.icon} />
+								</svg>
+							</span>
+							<span class="post-meta">{category.label} / {formatDate(post.data.pubDate)}</span>
+							<h3>{post.data.title}</h3>
+							<p>{post.data.description}</p>
+							<div class="tag-row">
+								{post.data.tags.map((tag) => (
+									<span>{tag}</span>
+								))}
+							</div>
+						</a>
+					);
+				})}
+			</div>
+		</section>
+	</main>
 </Layout>
+
+<script>
+	const categories = ['life', 'tech', 'work'];
+	const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
+	const quickButtons = Array.from(document.querySelectorAll('[data-filter-target]'));
+	const cards = Array.from(document.querySelectorAll('[data-category]'));
+
+	const setFilter = (filter, shouldScroll = false) => {
+		const nextFilter = categories.includes(filter) ? filter : 'all';
+
+		for (const button of filterButtons) {
+			const active = button.getAttribute('data-filter') === nextFilter;
+			button.classList.toggle('active', active);
+			button.setAttribute('aria-pressed', String(active));
+		}
+
+		for (const card of cards) {
+			const visible = nextFilter === 'all' || card.getAttribute('data-category') === nextFilter;
+			card.toggleAttribute('hidden', !visible);
+		}
+
+		if (nextFilter !== 'all') {
+			history.replaceState(null, '', `#${nextFilter}`);
+		} else if (location.hash) {
+			history.replaceState(null, '', location.pathname);
+		}
+
+		if (shouldScroll) {
+			document.getElementById('blog')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		}
+	};
+
+	for (const button of filterButtons) {
+		button.addEventListener('click', () => setFilter(button.getAttribute('data-filter') || 'all'));
+	}
+
+	for (const button of quickButtons) {
+		button.addEventListener('click', () =>
+			setFilter(button.getAttribute('data-filter-target') || 'all', true),
+		);
+	}
+
+	const initialHash = location.hash.replace('#', '');
+	if (categories.includes(initialHash)) {
+		setFilter(initialHash);
+	}
+</script>
+
+<style>
+	.site-shell {
+		position: relative;
+		width: min(1180px, calc(100% - 32px));
+		margin: 0 auto;
+		padding: 48px 0 80px;
+	}
+
+	.hero {
+		min-height: 92vh;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(330px, 440px);
+		gap: 42px;
+		align-items: center;
+		padding: 32px 0;
+	}
+
+	.hero-copy {
+		position: relative;
+		z-index: 1;
+	}
+
+	.system-label {
+		margin: 0 0 16px;
+		color: var(--green);
+		font-size: 13px;
+		font-weight: 800;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	.logo-wrap {
+		position: relative;
+		width: fit-content;
+		perspective: 900px;
+	}
+
+	.logo-mark {
+		position: relative;
+		margin: 0;
+		background: linear-gradient(
+			90deg,
+			var(--cyan),
+			var(--amber),
+			var(--magenta),
+			var(--green),
+			#ffffff,
+			var(--cyan)
+		);
+		background-size: 360% 100%;
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		font-family:
+			Impact, Haettenschweiler, 'Arial Black', 'Segoe UI Black', system-ui, sans-serif;
+		font-size: clamp(76px, 14vw, 176px);
+		font-style: italic;
+		font-weight: 900;
+		line-height: 0.86;
+		text-shadow:
+			2px 2px 0 rgba(255, 255, 255, 0.2),
+			8px 10px 0 rgba(0, 0, 0, 0.72),
+			18px 22px 0 rgba(255, 45, 149, 0.17),
+			30px 34px 0 rgba(0, 245, 212, 0.1);
+		transform: rotateX(9deg) rotateY(-14deg) skewX(-8deg);
+		animation: logo-fill 7s ease-in-out infinite, logo-push 4.8s ease-in-out infinite;
+	}
+
+	.logo-mark::before,
+	.logo-mark::after {
+		display: none;
+		content: '';
+	}
+
+	.hero-text {
+		max-width: 620px;
+		margin: 28px 0 0;
+		color: #c6d6e6;
+		font-size: 20px;
+		line-height: 1.8;
+	}
+
+	.signal-dock {
+		position: relative;
+		z-index: 10;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 16px;
+		align-self: center;
+	}
+
+	.depth-block {
+		position: relative;
+		border: 1px solid rgba(146, 246, 255, 0.24);
+		border-radius: 8px;
+		background:
+			linear-gradient(145deg, rgba(10, 16, 24, 0.9), rgba(18, 24, 35, 0.78)) padding-box,
+			linear-gradient(135deg, rgba(0, 245, 212, 0.48), rgba(255, 45, 149, 0.32)) border-box;
+		box-shadow:
+			10px 10px 0 rgba(0, 245, 212, 0.08),
+			18px 18px 0 rgba(255, 45, 149, 0.06),
+			0 22px 50px rgba(0, 0, 0, 0.34),
+			inset 0 1px 0 rgba(255, 255, 255, 0.11);
+	}
+
+	.depth-block::before {
+		position: absolute;
+		inset: 7px -10px -10px 7px;
+		z-index: -1;
+		border-radius: 8px;
+		content: '';
+		background: linear-gradient(135deg, rgba(0, 245, 212, 0.18), rgba(255, 45, 149, 0.16));
+	}
+
+	.depth-block::after {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 8px;
+		content: '';
+		transform: translate(4px, 4px);
+	}
+
+	.dock-link,
+	.dock-cluster {
+		min-height: 118px;
+	}
+
+	.dock-link {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		padding: 20px;
+		color: #f7fbff;
+		text-decoration: none;
+		transition:
+			transform 180ms ease,
+			border-color 180ms ease,
+			box-shadow 180ms ease;
+	}
+
+	.dock-link:hover,
+	.dock-link:focus-visible,
+	.dock-cluster:hover,
+	.dock-cluster:focus-within {
+		border-color: rgba(255, 207, 74, 0.72);
+		box-shadow:
+			12px 12px 0 rgba(255, 207, 74, 0.08),
+			22px 22px 0 rgba(0, 245, 212, 0.08),
+			0 28px 58px rgba(0, 0, 0, 0.44),
+			0 0 34px rgba(0, 245, 212, 0.16);
+		transform: translate(-2px, -2px);
+	}
+
+	.link-icon,
+	.category-icon,
+	.post-glyph {
+		display: inline-grid;
+		flex: 0 0 auto;
+		place-items: center;
+		width: 42px;
+		height: 42px;
+		border: 1px solid rgba(0, 245, 212, 0.38);
+		border-radius: 8px;
+		background: rgba(0, 245, 212, 0.08);
+		color: var(--cyan);
+		box-shadow:
+			4px 4px 0 rgba(255, 45, 149, 0.16),
+			0 0 24px rgba(0, 245, 212, 0.16);
+	}
+
+	svg {
+		width: 24px;
+		height: 24px;
+		fill: none;
+		stroke: currentColor;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 1.8;
+	}
+
+	.link-icon svg path:first-child,
+	.category-icon svg path:first-child,
+	.post-glyph svg path:first-child {
+		fill: rgba(0, 245, 212, 0.08);
+	}
+
+	.dock-link:hover .link-icon,
+	.dock-link:focus-visible .link-icon,
+	.blog-hub:hover .link-icon,
+	.category-tab:hover .category-icon,
+	.category-tab:focus-visible .category-icon,
+	.post-card:hover .post-glyph,
+	.post-card:focus-visible .post-glyph {
+		animation: icon-jitter 360ms steps(2, end) infinite;
+	}
+
+	.dock-link span:last-child {
+		font-size: 18px;
+		font-weight: 800;
+	}
+
+	.dock-cluster {
+		z-index: 20;
+		padding: 0;
+	}
+
+	.blog-hub:hover,
+	.blog-hub:focus-within {
+		z-index: 200;
+	}
+
+	.dock-link-flat {
+		position: relative;
+		z-index: 2;
+		min-height: 116px;
+		border: 0;
+		background: transparent;
+		box-shadow: none;
+	}
+
+	.dock-link-flat::before,
+	.dock-link-flat::after {
+		display: none;
+	}
+
+	.category-popover {
+		position: absolute;
+		top: calc(100% + 14px);
+		right: 0;
+		z-index: 300;
+		display: grid;
+		width: min(270px, 82vw);
+		gap: 8px;
+		padding: 14px;
+		border: 1px solid rgba(255, 207, 74, 0.42);
+		border-radius: 8px;
+		background: rgba(8, 13, 20, 0.96);
+		box-shadow:
+			10px 10px 0 rgba(0, 245, 212, 0.08),
+			0 26px 54px rgba(0, 0, 0, 0.5);
+		opacity: 0;
+		pointer-events: none;
+		transform: translateY(10px);
+		transition:
+			opacity 160ms ease,
+			transform 160ms ease;
+	}
+
+	.category-popover p {
+		margin: 0 0 4px;
+		color: var(--amber);
+		font-size: 12px;
+		font-weight: 900;
+		text-transform: uppercase;
+	}
+
+	.blog-hub:hover .category-popover,
+	.blog-hub:focus-within .category-popover {
+		opacity: 1;
+		pointer-events: auto;
+		transform: translateY(0);
+	}
+
+	.popover-option {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		width: 100%;
+		padding: 11px 12px;
+		border: 1px solid rgba(0, 245, 212, 0.22);
+		border-radius: 6px;
+		background: rgba(255, 255, 255, 0.04);
+		color: #effbff;
+		cursor: pointer;
+	}
+
+	.popover-option:hover,
+	.popover-option:focus-visible {
+		border-color: rgba(0, 245, 212, 0.7);
+		background: rgba(0, 245, 212, 0.1);
+	}
+
+	.popover-option small {
+		color: var(--muted);
+	}
+
+	.feature-strip {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 18px;
+		margin: -58px 0 86px;
+	}
+
+	.status-tile {
+		padding: 20px;
+	}
+
+	.status-tile strong {
+		display: block;
+		margin: 10px 0 6px;
+		font-size: 18px;
+	}
+
+	.status-tile p {
+		margin: 0;
+		color: var(--muted);
+		line-height: 1.6;
+	}
+
+	.status-dot {
+		display: block;
+		width: 10px;
+		height: 10px;
+		background: var(--cyan);
+		box-shadow: 0 0 18px var(--cyan);
+	}
+
+	.status-dot-pink {
+		background: var(--magenta);
+		box-shadow: 0 0 18px var(--magenta);
+	}
+
+	.status-dot-amber {
+		background: var(--amber);
+		box-shadow: 0 0 18px var(--amber);
+	}
+
+	.blog-board {
+		padding: 18px 0 40px;
+	}
+
+	.section-heading {
+		max-width: 760px;
+		margin-bottom: 28px;
+	}
+
+	.section-heading h2 {
+		margin: 0;
+		font-size: 42px;
+		line-height: 1.08;
+	}
+
+	.section-heading p:last-child {
+		margin: 14px 0 0;
+		color: var(--muted);
+		font-size: 17px;
+		line-height: 1.8;
+	}
+
+	.category-tabs {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 16px;
+		margin-bottom: 28px;
+	}
+
+	.category-tab {
+		display: grid;
+		min-height: 154px;
+		gap: 12px;
+		align-content: start;
+		padding: 18px;
+		border: 1px solid rgba(146, 246, 255, 0.22);
+		border-radius: 8px;
+		background: rgba(12, 18, 26, 0.82);
+		box-shadow:
+			8px 8px 0 rgba(0, 245, 212, 0.07),
+			14px 14px 0 rgba(255, 45, 149, 0.05);
+		cursor: pointer;
+		text-align: left;
+		transition:
+			transform 180ms ease,
+			border-color 180ms ease,
+			background 180ms ease;
+	}
+
+	.category-tab:hover,
+	.category-tab:focus-visible,
+	.category-tab.active {
+		border-color: rgba(255, 207, 74, 0.78);
+		background: rgba(20, 28, 38, 0.94);
+		transform: translate(-2px, -2px);
+	}
+
+	.category-tab strong {
+		font-size: 22px;
+	}
+
+	.category-tab small {
+		color: var(--muted);
+		font-size: 14px;
+		line-height: 1.6;
+	}
+
+	.featured {
+		display: grid;
+		gap: 10px;
+		margin-bottom: 24px;
+		padding: 24px;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.featured-kicker,
+	.post-meta {
+		color: var(--amber);
+		font-size: 12px;
+		font-weight: 900;
+		text-transform: uppercase;
+	}
+
+	.featured strong {
+		font-size: 28px;
+	}
+
+	.featured p,
+	.featured span:last-child {
+		margin: 0;
+		color: var(--muted);
+		line-height: 1.7;
+	}
+
+	.post-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 20px;
+	}
+
+	.post-card {
+		display: grid;
+		min-height: 292px;
+		gap: 14px;
+		align-content: start;
+		padding: 22px;
+		color: inherit;
+		text-decoration: none;
+		transition:
+			transform 180ms ease,
+			border-color 180ms ease,
+			box-shadow 180ms ease;
+	}
+
+	.post-card:hover,
+	.post-card:focus-visible,
+	.featured:hover,
+	.featured:focus-visible {
+		border-color: rgba(255, 207, 74, 0.7);
+		transform: translate(-3px, -3px);
+	}
+
+	.post-card[hidden] {
+		display: none;
+	}
+
+	.post-card h3 {
+		margin: 0;
+		font-size: 24px;
+		line-height: 1.25;
+	}
+
+	.post-card p {
+		margin: 0;
+		color: #afc0ce;
+		line-height: 1.7;
+	}
+
+	.tag-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: auto;
+	}
+
+	.tag-row span {
+		padding: 6px 9px;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 6px;
+		background: rgba(255, 255, 255, 0.05);
+		color: #d7e7f2;
+		font-size: 12px;
+	}
+
+	.accent-cyan {
+		--accent: var(--cyan);
+	}
+
+	.accent-magenta {
+		--accent: var(--magenta);
+	}
+
+	.accent-amber {
+		--accent: var(--amber);
+	}
+
+	.accent-green {
+		--accent: var(--green);
+	}
+
+	.post-card,
+	.featured {
+		border-color: color-mix(in srgb, var(--accent, var(--cyan)) 42%, transparent);
+	}
+
+	@keyframes icon-jitter {
+		0% {
+			transform: translate(0, 0) rotate(0deg);
+		}
+
+		35% {
+			transform: translate(1px, -2px) rotate(-4deg);
+		}
+
+		70% {
+			transform: translate(-2px, 1px) rotate(4deg);
+		}
+
+		100% {
+			transform: translate(0, 0) rotate(0deg);
+		}
+	}
+
+	@keyframes logo-fill {
+		0%,
+		100% {
+			background-position: 0% 50%;
+		}
+
+		50% {
+			background-position: 100% 50%;
+		}
+	}
+
+	@keyframes logo-push {
+		0%,
+		100% {
+			transform: rotateX(9deg) rotateY(-14deg) skewX(-8deg) translateZ(0);
+		}
+
+		50% {
+			transform: rotateX(11deg) rotateY(-18deg) skewX(-8deg) translate(8px, -3px);
+		}
+	}
+
+	@media (max-width: 980px) {
+		.hero {
+			min-height: auto;
+			grid-template-columns: 1fr;
+			padding-top: 70px;
+		}
+
+		.signal-dock,
+		.category-tabs,
+		.post-grid,
+		.feature-strip {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.feature-strip {
+			margin-top: 0;
+		}
+	}
+
+	@media (max-width: 680px) {
+		.site-shell {
+			width: min(100% - 24px, 1180px);
+			padding-bottom: 54px;
+		}
+
+		.logo-mark {
+			font-size: 78px;
+		}
+
+		.hero-text {
+			font-size: 17px;
+		}
+
+		.signal-dock,
+		.category-tabs,
+		.post-grid,
+		.feature-strip {
+			grid-template-columns: 1fr;
+		}
+
+		.category-popover {
+			right: auto;
+			left: 0;
+		}
+
+		.section-heading h2 {
+			font-size: 34px;
+		}
+	}
+</style>
