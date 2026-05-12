@@ -108,7 +108,7 @@ const readMinutes = (body?: string) => `${Math.max(1, Math.ceil((body?.length ??
 					</div>
 				</div>
 
-				<a class="dock-link depth-block" href="#wechat-card">
+				<a class="dock-link depth-block" href="#top">
 					<span class="link-icon">
 						<svg viewBox="0 0 24 24" aria-hidden="true">
 							<path d="M9.2 15.8c-3.1 0-5.7-2-5.7-4.6s2.6-4.7 5.7-4.7 5.7 2.1 5.7 4.7-2.6 4.6-5.7 4.6Z" />
@@ -138,24 +138,6 @@ const readMinutes = (body?: string) => `${Math.max(1, Math.ceil((body?.length ??
 					<span>GitHub</span>
 				</a>
 			</nav>
-		</section>
-
-		<section class="feature-strip" aria-label="站点摘要">
-			<div class="depth-block status-tile">
-				<span class="status-dot"></span>
-				<strong>分类</strong>
-				<p>生活 / 技术 / 工作</p>
-			</div>
-			<div class="depth-block status-tile">
-				<span class="status-dot status-dot-pink"></span>
-				<strong>文章</strong>
-				<p>{posts.length} 篇已上线</p>
-			</div>
-			<div class="depth-block status-tile" id="wechat-card">
-				<span class="status-dot status-dot-amber"></span>
-				<strong>微信</strong>
-				<p>kalyan-wechat</p>
-			</div>
 		</section>
 
 		<section class="blog-board" id="blog" aria-labelledby="blog-title">
@@ -723,49 +705,8 @@ const readMinutes = (body?: string) => `${Math.max(1, Math.ceil((body?.length ??
 		color: var(--muted);
 	}
 
-	.feature-strip {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 18px;
-		margin: -58px 0 86px;
-	}
-
-	.status-tile {
-		padding: 20px;
-	}
-
-	.status-tile strong {
-		display: block;
-		margin: 10px 0 6px;
-		font-size: 18px;
-	}
-
-	.status-tile p {
-		margin: 0;
-		color: var(--muted);
-		line-height: 1.6;
-	}
-
-	.status-dot {
-		display: block;
-		width: 10px;
-		height: 10px;
-		background: var(--cyan);
-		box-shadow: 0 0 18px var(--cyan);
-	}
-
-	.status-dot-pink {
-		background: var(--magenta);
-		box-shadow: 0 0 18px var(--magenta);
-	}
-
-	.status-dot-amber {
-		background: var(--amber);
-		box-shadow: 0 0 18px var(--amber);
-	}
-
 	.blog-board {
-		padding: 18px 0 40px;
+		padding: 26px 0 40px;
 	}
 
 	.section-heading {
@@ -1003,13 +944,8 @@ const readMinutes = (body?: string) => `${Math.max(1, Math.ceil((body?.length ??
 
 		.signal-dock,
 		.category-tabs,
-		.post-grid,
-		.feature-strip {
+		.post-grid {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-
-		.feature-strip {
-			margin-top: 0;
 		}
 	}
 
@@ -1029,8 +965,7 @@ const readMinutes = (body?: string) => `${Math.max(1, Math.ceil((body?.length ??
 
 		.signal-dock,
 		.category-tabs,
-		.post-grid,
-		.feature-strip {
+		.post-grid {
 			grid-template-columns: 1fr;
 		}
 

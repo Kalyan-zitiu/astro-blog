@@ -32,7 +32,7 @@ const formatDate = (date: Date) =>
 	<ParticleField />
 	<main class="article-shell">
 		<a class="back-link" href="/#blog">返回文章分类</a>
-		<article class={`article-panel accent-${post.data.accent}`}>
+		<article class={`article-page accent-${post.data.accent}`}>
 			<header class="article-header">
 				<p class="system-label">{categoryLabel[post.data.category]} / {formatDate(post.data.pubDate)}</p>
 				<h1>{post.data.title}</h1>
@@ -52,9 +52,9 @@ const formatDate = (date: Date) =>
 
 <style>
 	.article-shell {
-		width: min(860px, calc(100% - 32px));
+		width: min(1180px, calc(100% - 40px));
 		margin: 0 auto;
-		padding: 42px 0 84px;
+		padding: 46px 0 96px;
 	}
 
 	.back-link {
@@ -73,43 +73,17 @@ const formatDate = (date: Date) =>
 		color: var(--amber);
 	}
 
-	.article-panel {
+	.article-page {
 		position: relative;
-		padding: 34px;
-		border: 1px solid color-mix(in srgb, var(--accent, var(--cyan)) 44%, transparent);
-		border-radius: 8px;
-		background:
-			linear-gradient(150deg, rgba(8, 14, 22, 0.96), rgba(14, 21, 30, 0.88)) padding-box,
-			linear-gradient(135deg, rgba(0, 245, 212, 0.46), rgba(255, 45, 149, 0.28)) border-box;
-		box-shadow:
-			12px 12px 0 rgba(0, 245, 212, 0.08),
-			22px 22px 0 rgba(255, 45, 149, 0.06),
-			0 34px 70px rgba(0, 0, 0, 0.42),
-			inset 0 1px 0 rgba(255, 255, 255, 0.11);
-	}
-
-	.article-panel::before,
-	.article-panel::after {
-		position: absolute;
-		z-index: -1;
-		border-radius: 8px;
-		content: '';
-	}
-
-	.article-panel::before {
-		inset: 8px -12px -12px 8px;
-		background: linear-gradient(135deg, rgba(0, 245, 212, 0.16), rgba(255, 45, 149, 0.16));
-	}
-
-	.article-panel::after {
-		inset: 0;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		transform: translate(4px, 4px);
+		min-height: calc(100vh - 150px);
 	}
 
 	.article-header {
-		padding-bottom: 28px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+		padding: 44px 0 38px;
+		border-bottom: 1px solid color-mix(in srgb, var(--accent, var(--cyan)) 34%, transparent);
+		background:
+			linear-gradient(90deg, rgba(0, 245, 212, 0.09), transparent 38%),
+			linear-gradient(135deg, rgba(255, 45, 149, 0.08), transparent 42%);
 	}
 
 	.system-label {
@@ -123,15 +97,16 @@ const formatDate = (date: Date) =>
 
 	.article-header h1 {
 		margin: 0;
-		font-size: 48px;
-		line-height: 1.12;
+		max-width: 980px;
+		font-size: clamp(42px, 6vw, 86px);
+		line-height: 1.08;
 	}
 
 	.article-header p:not(.system-label) {
-		max-width: 680px;
-		margin: 18px 0 0;
+		max-width: 860px;
+		margin: 22px 0 0;
 		color: var(--muted);
-		font-size: 18px;
+		font-size: 21px;
 		line-height: 1.8;
 	}
 
@@ -152,21 +127,22 @@ const formatDate = (date: Date) =>
 	}
 
 	.article-body {
-		padding-top: 30px;
+		width: min(920px, 100%);
+		padding-top: 46px;
 		color: #dce9f4;
-		font-size: 18px;
-		line-height: 1.9;
+		font-size: 20px;
+		line-height: 2;
 	}
 
 	:global(.article-body h2) {
-		margin: 34px 0 12px;
+		margin: 48px 0 16px;
 		color: #ffffff;
-		font-size: 28px;
+		font-size: 34px;
 		line-height: 1.25;
 	}
 
 	:global(.article-body p) {
-		margin: 0 0 20px;
+		margin: 0 0 24px;
 	}
 
 	:global(.article-body code) {
@@ -195,12 +171,8 @@ const formatDate = (date: Date) =>
 
 	@media (max-width: 680px) {
 		.article-shell {
-			width: min(100% - 24px, 860px);
+			width: min(100% - 24px, 1180px);
 			padding-top: 28px;
-		}
-
-		.article-panel {
-			padding: 24px 18px;
 		}
 
 		.article-header h1 {
@@ -209,6 +181,7 @@ const formatDate = (date: Date) =>
 
 		.article-body {
 			font-size: 16px;
+			line-height: 1.9;
 		}
 	}
 </style>
